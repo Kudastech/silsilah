@@ -31,26 +31,25 @@ Route::middleware('auth')->group(function () {
         Route::get('home', 'index')->name('home');
         Route::get('profile', 'index')->name('profile');
     });
-
-    Route::controller(FamilyActionsController::class)->group(function () {
-        Route::post('family-actions/{user}/set-father', 'setFather')->name('family-actions.set-father');
-        Route::post('family-actions/{user}/set-mother', 'setMother')->name('family-actions.set-mother');
-        Route::post('family-actions/{user}/add-child', 'addChild')->name('family-actions.add-child');
-        Route::post('family-actions/{user}/add-wife', 'addWife')->name('family-actions.add-wife');
-        Route::post('family-actions/{user}/add-husband', 'addHusband')->name('family-actions.add-husband');
-        Route::post('family-actions/{user}/set-parent', 'setParent')->name('family-actions.set-parent');
+    Route::controller(FamilyActionsController::class)->prefix('family-actions/{user}')->group(function () {
+        Route::post('set-father', 'setFather')->name('family-actions.set-father');
+        Route::post('set-mother', 'setMother')->name('family-actions.set-mother');
+        Route::post('add-child', 'addChild')->name('family-actions.add-child');
+        Route::post('add-wife', 'addWife')->name('family-actions.add-wife');
+        Route::post('add-husband', 'addHusband')->name('family-actions.add-husband');
+        Route::post('set-parent', 'setParent')->name('family-actions.set-parent');
     });
-
-    Route::controller(UsersController::class)->group(function () {
+    
+    Route::controller(UsersController::class)->prefix('users/{user}')->group(function () {
         Route::get('profile-search', 'search')->name('users.search');
-        Route::get('users/{user}', 'show')->name('users.show');
-        Route::get('users/{user}/edit', 'edit')->name('users.edit');
-        Route::patch('users/{user}', 'update')->name('users.update');
-        Route::get('users/{user}/chart', 'chart')->name('users.chart');
-        Route::get('users/{user}/tree', 'tree')->name('users.tree');
-        Route::get('users/{user}/death', 'death')->name('users.death');
-        Route::patch('users/{user}/photo-upload', 'photoUpload')->name('users.photo-upload');
-        Route::delete('users/{user}', 'destroy')->name('users.destroy');
+        Route::get('', 'show')->name('users.show');
+        Route::get('edit', 'edit')->name('users.edit');
+        Route::patch('', 'update')->name('users.update');
+        Route::get('chart', 'chart')->name('users.chart');
+        Route::get('tree', 'tree')->name('users.tree');
+        Route::get('death', 'death')->name('users.death');
+        Route::patch('photo-upload', 'photoUpload')->name('users.photo-upload');
+        Route::delete('', 'destroy')->name('users.destroy');
     });
 
     Route::get('users/{user}/marriages', [UserMarriagesController::class, 'index'])->name('users.marriages');
@@ -59,16 +58,17 @@ Route::middleware('auth')->group(function () {
     /**
      * Couple/Marriages Routes
      */
-    Route::controller(CouplesController::class)->group(function () {
-        Route::get('couples/{couple}', 'show')->name('couples.show');
-        Route::get('couples/{couple}/edit', 'edit')->name('couples.edit');
-        Route::patch('couples/{couple}', 'update')->name('couples.update');
+    Route::controller(CouplesController::class)->prefix('couples/{couple}')->group(function () {
+        Route::get('', 'show')->name('couples.show');
+        Route::get('edit', 'edit')->name('couples.edit');
+        Route::patch('', 'update')->name('couples.update');
     });
-
-    Route::controller(ChangePasswordController::class)->group(function () {
-        Route::get('password/change', 'show')->name('password_change');
-        Route::post('password/change', 'update')->name('password_update');
+    
+    Route::controller(ChangePasswordController::class)->prefix('password')->group(function () {
+        Route::get('change', 'show')->name('password_change');
+        Route::post('change', 'update')->name('password_update');
     });
+    
 });
 
 /**
@@ -78,10 +78,11 @@ Route::group(['middleware' => 'admin'], function () {
     /**
      * Backup Restore Database Routes
      */
-    Route::controller(BackupsController::class)->group(function () {
-        Route::post('backups/upload', 'upload')->name('backups.upload');
-        Route::post('backups/{fileName}/restore', 'restore')->name('backups.restore');
-        Route::get('backups/{fileName}/dl', 'download')->name('backups.download');
+    Route::controller(BackupsController::class)->prefix('backups')->group(function () {
+        Route::post('upload', 'upload')->name('backups.upload');
+        Route::post('{fileName}/restore', 'restore')->name('backups.restore');
+        Route::get('{fileName}/dl', 'download')->name('backups.download');
     });
+    
     Route::resource('backups', BackupsController::class);
 });
